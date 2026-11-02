@@ -1,42 +1,70 @@
-# Labels over architectures: 12-finding knee MRI classification
+<div align="center">
 
-**Multi-sequence knee MRI · 12 findings · macro ROC-AUC · offline, 9 hours on 2 × T4** · held-out private score **0.944** ([final notebook](https://www.kaggle.com/code/adityakumarrai0401/rsna-knee-label-ft-coatnet-specialists-blend))
+# Label Repair over Architecture Search
+### Multi-Finding Knee MRI Classification under Noisy Labels
+
+**Aditya Kumar Rai**
+
+[📄 Technical report](docs/REPORT.md) · [💻 Code](src/) · [📓 Final inference notebook](notebooks/final_submission_private_0944.ipynb) · [📚 Citation](#citation)
+
+</div>
 
 <p align="center"><img src="assets/system.svg" width="100%"></p>
 
-**Question.** The training labels for several findings (lateral and patellofemoral osteoarthritis, synovitis) disagree with what is visible in the images. With a strong public baseline already in place, is it better to add new architectures or to repair the labels?
+> **TL;DR.** Detecting 12 abnormalities in multi-sequence knee MRI with weak, report-derived labels: new architectures (3D pretraining, EfficientNetV2, distilled students) **never earned blend weight**, while **repairing the labels of the noisiest findings** and adding per-finding specialists raised held-out macro AUC **0.942 → 0.944**. The public score stayed flat at 0.958. A 58-study expert set **ranks models correctly but cannot resolve < 0.003 AUC**.
 
-**What we did.**
-* Rebuilt the noisiest labels from **images plus radiology reports**, then fine-tuned a CoAtNet on them.
-* Retrained a CoAtNet on the best label source per finding (with a seed **weight soup**).
-* Added a **patellofemoral-OA specialist** (axial + mid-sagittal views, pixel-exact preprocessing).
-* Blended everything **per finding**.
-* Every change had to win on a **hand-checked 58-study gold set** with a bootstrap test before submission.
+## Abstract
+Most training labels here are weak and partly derived from radiology reports; for several findings (lateral and patellofemoral osteoarthritis, synovitis) they disagree with the images. Starting from a strong public ensemble, we compare two ways to improve it under a 9-hour, two-GPU offline inference budget:
+1. **architecture search:** four independently trained arms;
+2. **label repair:** image-and-report relabelling, per-finding best label sources, and finding-specific specialists.
 
-## Findings
+We also measure how far a small expert-labelled set can be trusted for model selection.
 
+## Key results
 <table><tr>
 <td width="50%"><img src="assets/architectures_vs_labels.svg"></td>
 <td width="50%"><img src="assets/public_vs_private.svg"></td>
 </tr><tr>
-<td><sub><b>New architectures alone did not compete.</b> A 3D MedicalNet, EfficientNetV2-S and a distilled ResNet34 scored 0.69–0.89 standalone and never earned blend weight.</sub></td>
-<td><sub><b>Label work generalised.</b> The public leaderboard stayed flat at 0.958 while every label-focused change held or improved the held-out private score (0.942 → 0.944).</sub></td>
+<td><sub><b>Architectures alone did not compete.</b> Volumetric, 2.5D and distilled arms scored 0.69–0.89 standalone; none earned weight in a gated blend.</sub></td>
+<td><sub><b>Label repair generalised.</b> Every label-focused change held or improved the held-out score while the public score could not see it.</sub></td>
+</tr><tr>
+<td width="50%"><img src="assets/gold_vs_hidden.svg"></td>
+<td width="50%"><img src="assets/learning_curves.svg"></td>
+</tr><tr>
+<td><sub><b>Small expert sets: good for ordering, not for tuning.</b> 58 studies predicted the hidden-set ranking, but a +0.0019 gold-set gain scored lower on the leaderboard.</sub></td>
+<td><sub><b>Learning dynamics.</b> Volumetric 3D pretraining plateaued within a few epochs; 2.5D models kept improving but stayed far below the ensemble.</sub></td>
 </tr></table>
 
-* **Small gold sets have a resolution limit.** 58 studies caught regressions but could not rank changes below about 0.003 AUC; one change that looked +0.002 on the gold set scored lower on the leaderboard.
-* **Preprocessing parity is a silent failure mode.** Training and inference preprocessing had to be verified pixel-exact; mismatches cost AUC without any error.
+| Ablation (held-out macro AUC) | Result |
+|---|---|
+| Public recipe → + relabelled-finding CoAtNet | 0.942 → 0.943 |
+| + patellofemoral-OA specialist, fracture weight 0.5 → 0.7 (gold-set bootstrap P = 0.99) | 0.943 |
+| + per-finding best-label retrained CoAtNet | **0.944** |
+| + seed weight soup | **0.944** |
+| Label-source consensus alone (equal-rank mean of 3 sources vs best single, Gold58) | +0.0007 (P = 0.61) |
 
-Full reports are in [`docs/research`](docs/research), a reusable checklist in [`docs/CV_CHALLENGE_PLAYBOOK.md`](docs/CV_CHALLENGE_PLAYBOOK.md), and every run in [`docs/experiments.csv`](docs/experiments.csv).
-
-## Code
+## Repository
 ```
-src/scripts     audits, label building, packaging and evaluation
-src/training    training code for every arm we tried
-src/inference   offline inference and blending
-notebooks/      the exact final notebook (private 0.944)
-docs/           research reports, playbook, experiment log
+src/training    training code for every arm (3D, 2.5D, distillation, specialists, label fine-tuning)
+src/inference   offline multi-series inference and per-finding rank blending
+src/scripts     label audits, gold-set gating with bootstrap tests, packaging, evaluation
+notebooks/      the exact final inference notebook
+docs/REPORT.md  technical report
+docs/research/  design notes, audits and decision records
+docs/experiments.csv  all 77 logged experiments with validation and outcomes
+assets/         figures (generated from logged results)
 ```
-Not included: competition data, derived labels and weights, which the competition rules don't allow redistributing ([data here](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection)).
+Data, derived labels and weights are not included: the challenge terms prohibit redistribution. The data is available from the [RSNA Knee Abnormality Detection challenge](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection).
 
-## Credits
-The base blend uses public models by goodpjw2008, heliosli, nartaa, rostigor and varshithakolupuri (linked in the notebook). Our code: Apache-2.0.
+## Citation
+```bibtex
+@techreport{rai2026labelrepair,
+  title  = {Label Repair over Architecture Search: Multi-Finding Knee MRI Classification under Noisy Labels},
+  author = {Rai, Aditya Kumar},
+  year   = {2026},
+  url    = {https://github.com/ADITYAKUMARRAI2007/label-repair-knee-mri}
+}
+```
+
+## Acknowledgements
+The base ensemble uses public models and code by goodpjw2008, heliosli, nartaa, rostigor and varshithakolupuri. Evaluated in the RSNA Knee Abnormality Detection 2026 challenge on Kaggle. Code under Apache-2.0.
