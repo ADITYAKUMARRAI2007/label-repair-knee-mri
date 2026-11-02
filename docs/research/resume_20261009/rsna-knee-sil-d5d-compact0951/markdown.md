@@ -1,0 +1,20 @@
+# sameerk2004 · sil-d5d-compact0951
+
+Public **0.951** recipe (heliosli `rsna-knee-blend-gold`): nartaa CoAtNet +
+four-fold compact ConvNeXt-Small `E_lrprior` at 70/30 rank blend.
+Different second model than our scored 0.950 goodpjw dual.
+Credits: heliosli, nartaa, dreaddevelopment.
+
+
+# RSNA Knee: rank blend of the public Raptor model and our compact model
+
+Private. Stage 1 runs the public notebook [RSNA Knee 0949 Anatomical Mirror](https://www.kaggle.com/code/nartaa/rsna-knee-0949-anatomical-mirror) as published: its checkpoint check and its scored source (SHA-256 `bcd864cb...`, verified when this notebook was built), with two marked `[blend]` changes (output file name, raw-probability dump). Stage 2 runs our compact convnext_small model (4 fold models, arm `E_lrprior`, bundle `c7ebab1eb953f1a6`) unchanged. Stage 3 averages per-finding percentile ranks with weights fixed before any run (Raptor 0.7, ours 0.3); nothing is fitted on labels or on the test set.
+
+
+## Credits and required acknowledgement
+
+Built on dreaddevelopment's [Raptor CoAtNet/MIL inference recipe and public baseline weights](https://www.kaggle.com/datasets/dreaddevelopment/raptor-knee-widedense). These are our retrained checkpoints, rather than those baseline weights. Weak-label sources include [stevenleehans](https://www.kaggle.com/datasets/stevenleehans/rsna-knee-llm-report-labels), [pilkwang](https://www.kaggle.com/datasets/pilkwang/rsna-knee-llm-labels), and [riadmohamed42's JEV labels and verification](https://www.kaggle.com/code/riadmohamed42/jev-knee-labels-verification), combined with our report-derived labels. Source reports and study-level label tables are not included here. The CoAtNet backbone comes from timm. Competition data is provided under the [RSNA Knee competition rules](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/rules).
+
+Data and/or research tools used in the preparation of this manuscript were obtained and analyzed from the controlled access datasets distributed from the Osteoarthritis Initiative (OAI), a data repository housed within the NIMH Data Archive (NDA). OAI is a collaborative informatics system created by the National Institute of Mental Health and the National Institute of Arthritis, Musculoskeletal and Skin Diseases (NIAMS) to provide a worldwide resource to quicken the pace of biomarker identification, scientific investigation and OA drug development. Dataset identifier(s): 10.15154/0hcg-f676.
+
+[Shared NDA Study](https://nda.nih.gov/study.html?id=3407) 路 [DOI: 10.15154/0hcg-f676](https://doi.org/10.15154/0hcg-f676). Official acknowledgement source: [NDA manuscript preparation](https://nda.nih.gov/nda/manuscript-preparation).
