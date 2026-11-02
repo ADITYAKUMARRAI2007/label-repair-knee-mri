@@ -5,6 +5,12 @@
 
 **Aditya Kumar Rai**
 
+<a href="https://www.kaggle.com/competitions/rsna-knee-abnormality-detection"><img src="https://img.shields.io/badge/Kaggle-RSNA_Knee_2026-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white"></a>
+<img src="https://img.shields.io/badge/Private_AUC-0.944-2EA043?style=for-the-badge">
+<img src="https://img.shields.io/badge/Experiments-77_logged-F0B400?style=for-the-badge">
+<img src="https://img.shields.io/badge/Inference-2×T4_·_9h-555?style=for-the-badge">
+<img src="https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge">
+
 [📄 Technical report](docs/REPORT.md) · [💻 Code](src/) · [📓 Final inference notebook](notebooks/final_submission_private_0944.ipynb) · [📚 Citation](#citation)
 
 </div>
